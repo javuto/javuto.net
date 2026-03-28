@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Oh Yeah</title>
+    <style>
+      body {
+        background-color: black;
+        background-image:url('nod.gif');
+        background-size:100%;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+        background-position: center;
+        height:100%;
+        width:100%;
+      }
+    </style>
+    <script>
+      function playMusic() {
+        var pl = document.getElementById("player");
+        pl.play();
+      }
+    </script>
+  </head>
+  <body onload="playMusic();">
+    <iframe src="audio/silence.mp3" allow="autoplay" id="audio" style="display:none"></iframe>
+    <audio id="player" autoplay loop controls>
+      <source src="audio/sax.mp3" type="audio/mp3">
+    </audio>
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        playMusic();
+      }, false);
+    </script>
+  </body>
+</html>

@@ -1,0 +1,86 @@
+set guioptions=
+colorscheme desert      " scheme
+set guifont=Monospace\ 8
+set nocompatible        " Usar los valores por defecto de VIM
+set nobackup            " No genera backups
+set incsearch           " nos sitúa automáticamente en la cadena que estemos buscandobu
+
+set ai                  " autoindenta
+"set cin                 " activar la indentación de C
+
+set showcmd             " muestra los comandos parcialmente
+set ignorecase          " ignorecase matching
+set smartcase
+set showmatch           " autorelaciona los ( )'s, { }'s, etc...
+set nu                  " numeracion de filas
+syntax on               " colorea la sintaxis
+set backspace=2         " permitir los backspace encima de cualquier cosa en el modo edición
+
+set ls=2                " barra de estado siempre visible
+
+" set scrolloff=999       " cursors en el medio de la pantalla
+
+set expandtab
+set sw=2
+set softtabstop=2
+set tabstop=2
+
+set textwidth=250
+set smarttab
+set cursorline cursorcolumn
+
+set ruler
+
+if has("autocmd")
+" When editing a file, always jump to the last cursor position
+  autocmd BufReadPost *
+  \ if line("'\"") > 0 && line ("'\"") <= line("$") |
+  \   exe "normal g'\"" |
+  \ endif
+endif
+
+
+" Python dict
+if has("autocmd")
+  autocmd FileType python set complete+=k/usr/share/vim/vimfiles/dict/pydiction-0.5/pydiction isk+=.,(
+endif
+
+"set mouse=a            " activa el mouse en consola
+"" Abreviaturas
+ab WQ wq
+ab wQ wq
+ab Wq wq
+let fs=0
+
+" Tabs
+
+nnoremap <tab> :tabnext<CR>
+nnoremap <S-tab> :tabprevious<CR>
+nnoremap <C-c> :tabclose<CR>
+
+"Exposee xD (pancake  -> nopcode.org)
+fun Exposee()
+if (g:fs == 0)
+  res 1000
+  vertical res 1000
+  let g:fs=1
+else
+  exe "normal \="
+  let g:fs=0
+endif
+endfun
+map  :call Exposee()
+
+
+" Removes trailing spaces
+function TrimWhiteSpace()
+: %s/\s*$//
+: ''
+:endfunction
+
+autocmd FileWritePre   * :call TrimWhiteSpace()
+autocmd FileAppendPre  * :call TrimWhiteSpace()
+autocmd FilterWritePre * :call TrimWhiteSpace()
+autocmd BufWritePre    * :call TrimWhiteSpace()
+
+" EOF

@@ -1,0 +1,69 @@
+==================================================================
+https://keybase.io/javuto
+--------------------------------------------------------------------
+
+I hereby claim:
+
+  * I am an admin of https://javuto.net
+  * I am javuto (https://keybase.io/javuto) on keybase.
+  * I have a public key with fingerprint CD66 1C05 A5B5 EC9B 6DE3  FCCF 75B6 7B77 C632 0911
+
+To do so, I am signing this object:
+
+{
+  "body": {
+    "key": {
+      "eldest_kid": "0101eb6b5f886659dda7d76ce161b320d6d9576467ec6151b9c728efdc852e91ab5d0a",
+      "fingerprint": "cd661c05a5b5ec9b6de3fccf75b67b77c6320911",
+      "host": "keybase.io",
+      "key_id": "75b67b77c6320911",
+      "kid": "0101eb6b5f886659dda7d76ce161b320d6d9576467ec6151b9c728efdc852e91ab5d0a",
+      "uid": "5400d236ae95a53b2d6cd63d2f01ec19",
+      "username": "javuto"
+    },
+    "service": {
+      "hostname": "javuto.net",
+      "protocol": "https:"
+    },
+    "type": "web_service_binding",
+    "version": 1
+  },
+  "ctime": 1507214633,
+  "expire_in": 157680000,
+  "prev": "bc6fa73ef30bf140cf58d916736584eff72a515c9bca275d963267ebc393fea3",
+  "seqno": 21,
+  "tag": "signature"
+}
+
+which yields the signature:
+
+-----BEGIN PGP MESSAGE-----
+Version: Keybase OpenPGP v2.0.74
+Comment: https://keybase.io/crypto
+
+yMIlAnicrVJbSBRRGF5NXRPsZlKBRQ0pRKvMmdlzZmezC1RGPRWJKArrnMvopM6s
+u+PmZmYv9mRXNbGUoKCQkJIulmaYmAld1iKyIIKKiMiEsocKu5yRegh67Lwczn++
+7/u/7z9nOHWWKyWuA29vfRtTm+Pu3mqpcRU92byqTsAWjQr+OqGCzWyskrKwHagw
+qOAXRCAChhGGus+HEFQp1RSqIMIAAliWRIqoChXkRQojCECAVaJIPqZT4oMSU4GG
+IRU1wSPohlnGQsGQYdpcllCEABGhBjFkRMWIMlknRFcgRgpWFIK4tgoAJ5ZbYYfB
+zWEtzHIMi9f4ITBj7x/4/+y7ZkYOekWRSjLSmMo9y1iiiEeQqaTzNgSoDjDMQqZW
+xTh6lxapsS2h3iPwWsQgzBmrk+Ov+xyT2ZwXDFm2RaxKXi+37WDY7/DsaNAB7mY4
+8FsigA2T8hlyRoSFwoZlCn7AkcQ2HE0ARUUCXiTLHoHVBo0QCxgOgmf0iXw5fViE
+S2KCdE2RmS6LWAdekejQR1WAFBlBn5fpuiJpEED+JkSTFEhVPlk+JExkVdaZJgtO
+qGrTEvwS4D61Mq4ZNspMza4JMaF+aLAkwRWX4kpKjHc+lytl9rw/X85rJ7suXDv1
+9erESPbK7s7jc7e/a+u9F6u+4Ze7V89ftHCfnZPe+L537/TTqsfr3MNZ8VNtGYkD
+lw5WxtpfjsY+bXtRnP6o9tipUP+B7tbJBlpcfaTUHJtzZer0vBXXlq0fb1x6syO+
+tEvoW1JS9Cwj82NR7iaWdC42mJgWnU5o+9Z83Z0/uqAlseLNmttw54s075yNYz1d
+nsCHnsamQKm/bE/m9+jnn30Z1a+9TZejJbXoXUFWdseG1NXLt3iCr08fy2vO72yb
+HM9sf3q4tFWZcN9Pd3+5UzlRVbA/rwQOXBwb2r/45KsfceefF0ayCwrPHNrRMHL0
+7NYbSQ/Wnig6kpvc3nS2d1H/w19sIz+l
+=qxkn
+-----END PGP MESSAGE-----
+
+And finally, I am proving ownership of this host by posting or
+appending to this document.
+
+View my publicly-auditable identity here: https://keybase.io/javuto
+
+==================================================================
+
