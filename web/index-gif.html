@@ -1,35 +1,398 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
-    <title>Oh Yeah</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>// javuto.net :: Oh Yeah</title>
     <style>
-      body {
-        background-color: black;
-        background-image:url('nod.gif');
-        background-size:100%;
-        background-repeat: no-repeat;
-        background-attachment: fixed;
-        background-position: center;
-        height:100%;
-        width:100%;
+      :root {
+        --green: #00ff41;
+        --green-dim: #008f11;
+        --amber: #ffb000;
+        --red: #ff003c;
+        --cyan: #00e5ff;
+        --black: #000300;
       }
+
+      * { box-sizing: border-box; }
+
+      html, body {
+        margin: 0; padding: 0;
+        height: 100%; width: 100%;
+        background: var(--black);
+        color: var(--green);
+        font-family: "Courier New", ui-monospace, SFMono-Regular, monospace;
+        overflow-x: hidden;
+        overflow-y: auto;
+        cursor: crosshair;
+      }
+
+      /* CRT scanlines + flicker + vignette */
+      #crt {
+        position: fixed; inset: 0; z-index: 50; pointer-events: none;
+        background:
+          linear-gradient(rgba(18,16,16,0) 50%, rgba(0,0,0,0.28) 50%),
+          linear-gradient(90deg, rgba(255,0,0,0.025), rgba(0,255,0,0.02), rgba(0,0,255,0.025));
+        background-size: 100% 3px, 100% 100%;
+        box-shadow: inset 0 0 180px rgba(0,0,0,0.9);
+        animation: crt-flicker 6s infinite;
+      }
+      #crt::after {
+        content: ""; position: absolute; inset: 0;
+        background: radial-gradient(ellipse at center, transparent 55%, rgba(0,0,0,0.6) 100%);
+      }
+      @keyframes crt-flicker { 0%,96%,100%{opacity:1} 97%{opacity:.82} 98%{opacity:.95} }
+
+      /* Subtle moving grid background */
+      #grid {
+        position: fixed; inset: 0; z-index: 0;
+        background-image:
+          linear-gradient(rgba(0,255,65,0.05) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(0,255,65,0.05) 1px, transparent 1px);
+        background-size: 38px 38px;
+        animation: grid-pan 12s linear infinite;
+      }
+      @keyframes grid-pan { to { background-position: 38px 38px; } }
+
+      main {
+        position: relative; z-index: 1;
+        height: 100%; min-height: 100%; width: 100%;
+        display: flex; flex-direction: column;
+        align-items: center; justify-content: center;
+        gap: 1.1rem; padding: 1.2rem;
+      }
+
+      /* The breach terminal */
+      .term {
+        width: min(680px, 94vw);
+        border: 1px solid var(--green-dim);
+        background: rgba(0, 8, 2, 0.72);
+        backdrop-filter: blur(2px);
+        box-shadow: 0 0 24px rgba(0,255,65,0.18), inset 0 0 30px rgba(0,255,65,0.04);
+      }
+      .titlebar {
+        display: flex; align-items: center; gap: .4rem;
+        padding: .32rem .6rem;
+        font-size: .7rem; letter-spacing: .18em; text-transform: uppercase;
+        border-bottom: 1px solid var(--green-dim);
+        color: var(--green-dim);
+        background: rgba(0,255,65,0.04);
+      }
+      .dot { width:.55rem; height:.55rem; border-radius:50%; background:var(--green-dim); box-shadow:0 0 6px var(--green); }
+      .titlebar .right { margin-left:auto; color:var(--amber); }
+
+      .screen {
+        padding: .85rem 1rem;
+        font-size: .8rem; line-height: 1.5;
+        text-shadow: 0 0 5px rgba(0,255,65,.55);
+        min-height: 9.5rem;
+        white-space: pre-wrap; word-break: break-word;
+      }
+      .screen .ln { display:block; }
+      .ok  { color: var(--green); }
+      .dim { color: var(--green-dim); }
+      .warn{ color: var(--amber); }
+      .err { color: var(--red); }
+      .cy  { color: var(--cyan); }
+      .bar {
+        display:inline-block; letter-spacing:0;
+        color: var(--green);
+        text-shadow: 0 0 6px rgba(0,255,65,.7);
+      }
+      .cursor {
+        display:inline-block; width:.55em; height:1em;
+        background: var(--green); margin-left:2px; vertical-align:-.15em;
+        animation: blink 1s steps(1) infinite;
+      }
+      @keyframes blink { 50%{opacity:0} }
+
+      .gif-frame {
+        border: 1px solid var(--green-dim);
+        padding: 6px; background: var(--black);
+        box-shadow: 0 0 26px rgba(0,255,65,0.28);
+        max-width: min(680px, 92vw);
+        opacity: 0; transform: scale(.96);
+        transition: opacity .5s ease, transform .5s ease, filter .5s ease;
+        filter: blur(8px);
+      }
+      .gif-frame.revealed { opacity:1; transform:scale(1); filter:blur(0); }
+      .gif-frame img { display:block; width:100%; height:auto; filter: drop-shadow(0 0 6px rgba(0,255,65,.35)); }
+
+      .glitch {
+        position: relative; margin: 0;
+        font-size: clamp(1.4rem, 4.5vw, 2.6rem);
+        letter-spacing: .12em; text-transform: uppercase;
+        color: var(--green);
+        text-shadow: 0 0 10px rgba(0,255,65,.7);
+        opacity: 0; transition: opacity .6s ease;
+      }
+      .glitch.show { opacity:1; animation: flicker 3.5s infinite; }
+      .glitch::before, .glitch::after { content: attr(data-text); position:absolute; inset:0; }
+      .glitch::before { color:#ff004d; animation: gx 2.6s infinite linear alternate-reverse; }
+      .glitch::after  { color:#00e5ff; animation: gy 2.2s infinite linear alternate-reverse; }
+      @keyframes gx { 0%,92%,100%{transform:translate(0,0)} 93%{transform:translate(-2px,1px);clip-path:inset(20% 0 60% 0)} 96%{transform:translate(2px,-1px);clip-path:inset(60% 0 20% 0)} }
+      @keyframes gy { 0%,90%,100%{transform:translate(0,0)} 91%{transform:translate(2px,1px)} 95%{transform:translate(-2px,-1px)} }
+      @keyframes flicker { 0%,18%,22%,25%,53%,57%,100%{opacity:1} 20%,24%,55%{opacity:.4} }
+
+      .caption {
+        font-size: .72rem; letter-spacing: .25em; text-transform: uppercase;
+        color: var(--green-dim); opacity: 0; transition: opacity .6s ease .2s;
+      }
+      .caption.show { opacity:1; }
+
+      #player {
+        width: min(680px, 94vw);
+        filter: hue-rotate(80deg) saturate(2.2) contrast(1.1);
+        opacity: .85;
+      }
+
+      /* Cypherpunk link grid */
+      .links {
+        width: min(680px, 94vw);
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: .55rem;
+        opacity: 0; transform: translateY(8px);
+        transition: opacity .6s ease .35s, transform .6s ease .35s;
+      }
+      .links.show { opacity:1; transform: translateY(0); }
+      .links a.full { grid-column: 1 / -1; }
+      @media (min-width: 720px) {
+        .links { grid-template-columns: repeat(4, 1fr); }
+      }
+      .links a {
+        position: relative;
+        display: flex; align-items: center; gap: .5rem;
+        padding: .6rem .8rem;
+        border: 1px solid var(--green-dim);
+        background: rgba(0, 8, 2, 0.55);
+        color: var(--green);
+        text-decoration: none;
+        font-size: .76rem; letter-spacing: .12em; text-transform: uppercase;
+        text-shadow: 0 0 5px rgba(0,255,65,.5);
+        overflow: hidden;
+        transition: background .15s ease, border-color .15s ease, transform .12s ease;
+      }
+      .links a::before {
+        content: ">";
+        color: var(--green-dim);
+        transition: color .15s ease, transform .15s ease;
+      }
+      .links a::after {
+        content: "";
+        position: absolute; left: 0; top: 0; bottom: 0; width: 2px;
+        background: var(--green); box-shadow: 0 0 8px var(--green);
+        transform: scaleY(0); transform-origin: top;
+        transition: transform .18s ease;
+      }
+      .links a:hover, .links a:focus-visible {
+        background: rgba(0,255,65,0.08);
+        border-color: var(--green);
+        transform: translateX(3px);
+        outline: none;
+      }
+      .links a:hover::before, .links a:focus-visible::before { color: var(--green); transform: translateX(2px); }
+      .links a:hover::after, .links a:focus-visible::after { transform: scaleY(1); }
+      .links a .ico { font-size: .9rem; opacity:.85; }
+
+      /* Featured link: JMP Security — blue cyber variant, centered */
+      .links a.full {
+        justify-content: center;
+        gap: .7rem;
+        padding: .85rem 1rem;
+        font-size: .82rem;
+        letter-spacing: .22em;
+        color: var(--cyan);
+        border-color: rgba(0,229,255,0.45);
+        background:
+          linear-gradient(90deg, rgba(0,229,255,0.10), rgba(0,255,65,0.06), rgba(0,229,255,0.10));
+        text-shadow: 0 0 8px rgba(0,229,255,0.65);
+        position: relative;
+        overflow: hidden;
+      }
+      .links a.full::before { content: ""; }
+      .links a.full .ico { color: var(--cyan); text-shadow: 0 0 8px rgba(0,229,255,0.7); }
+      /* sweeping blue scanline */
+      .links a.full::after {
+        content: "";
+        position: absolute; left:-30%; top:0; bottom:0; width: 30%;
+        background: linear-gradient(90deg, transparent, rgba(0,229,255,0.22), transparent);
+        transform: none; box-shadow: none;
+        animation: scan 3.2s linear infinite;
+      }
+      .links a.full:hover, .links a.full:focus-visible {
+        background: linear-gradient(90deg, rgba(0,229,255,0.18), rgba(0,255,65,0.08), rgba(0,229,255,0.18));
+        border-color: var(--cyan);
+        color: #bff8ff;
+        transform: scale(1.02);
+        box-shadow: 0 0 22px rgba(0,229,255,0.35), inset 0 0 18px rgba(0,229,255,0.12);
+      }
+      @keyframes scan { 0%{left:-30%} 100%{left:130%} }
+
+      /* Click-to-enter gate (cypherpunk flavored) */
+      #gate {
+        position: fixed; inset: 0; z-index: 80;
+        display: flex; align-items: center; justify-content: center;
+        background: rgba(0,3,0,0.86); backdrop-filter: blur(3px);
+        cursor: pointer; text-align: center;
+      }
+      #gate .box {
+        border: 1px solid var(--green-dim);
+        padding: 1.4rem 1.8rem;
+        background: rgba(0,8,2,0.6);
+        box-shadow: 0 0 30px rgba(0,255,65,.2);
+      }
+      #gate h2 {
+        margin: 0 0 .5rem; color: var(--green);
+        font-size: 1rem; letter-spacing: .2em; text-transform: uppercase;
+        text-shadow: 0 0 8px rgba(0,255,65,.6);
+      }
+      #gate p { margin:0; color: var(--green-dim); font-size: .78rem; letter-spacing:.1em; }
+      #gate .blink { color: var(--amber); animation: blink 1.1s steps(1) infinite; }
+      #gate.hidden { display:none; }
+
+      @media (max-width: 520px) { .screen { font-size: .7rem; } }
     </style>
-    <script>
-      function playMusic() {
-        var pl = document.getElementById("player");
-        pl.play();
-      }
-    </script>
   </head>
-  <body onload="playMusic();">
-    <iframe src="audio/silence.mp3" allow="autoplay" id="audio" style="display:none"></iframe>
-    <audio id="player" autoplay loop controls>
-      <source src="audio/sax.mp3" type="audio/mp3">
-    </audio>
+  <body>
+    <div id="grid"></div>
+
+    <main>
+      <h1 class="glitch" data-text="// Oh Yeah //">// Oh Yeah //</h1>
+
+      <div class="term">
+        <div class="titlebar">
+          <span class="dot"></span> javuto.net // breach@tty1
+          <span class="right">encrypt: AES-256</span>
+        </div>
+        <div class="screen" id="log"></div>
+      </div>
+
+      <div class="gif-frame" id="frame">
+        <img src="nod.gif" alt="You shall not pass" />
+      </div>
+      <div class="caption" id="cap">&gt;&gt; access denied — you shall not pass &lt;&lt;</div>
+
+      <nav class="links" id="links" aria-label="links">
+        <a href="https://jmpsec.com" target="_blank" rel="noopener" class="full"><span class="ico">🛡️</span>JMP Security</a>
+        <a href="https://github.com/javuto" target="_blank" rel="noopener"><span class="ico">⌘</span>GitHub</a>
+        <a href="https://www.linkedin.com/in/javiermarcosdeprado/" target="_blank" rel="noopener"><span class="ico">in</span>LinkedIn</a>
+        <a href="https://instagram.com/javuto" target="_blank" rel="noopener"><span class="ico">◎</span>Instagram</a>
+        <a href="https://twitter.com/javutin" target="_blank" rel="noopener"><span class="ico">✕</span>Twitter / X</a>
+      </nav>
+
+      <audio id="player" autoplay loop controls>
+        <source src="audio/sax.mp3" type="audio/mp3" />
+      </audio>
+    </main>
+
+    <div id="crt"></div>
+
+    <!-- Gate: unlocks audio + runs the hack sequence -->
+    <div id="gate" role="button" tabindex="0" aria-label="Connect">
+      <div class="box">
+        <h2>// secure uplink // </h2>
+        <p>click to connect &amp; enable audio <span class="blink">█</span></p>
+      </div>
+    </div>
+
     <script>
-      document.addEventListener('DOMContentLoaded', function() {
-        playMusic();
-      }, false);
+      (function () {
+        var pl = document.getElementById("player");
+        var log = document.getElementById("log");
+        var gate = document.getElementById("gate");
+        var frame = document.getElementById("frame");
+        var cap = document.getElementById("cap");
+        var glitch = document.querySelector(".glitch");
+        var links = document.getElementById("links");
+
+        /* ---- Audio: try autoplay, then guarantee on first interaction ---- */
+        var unlock = function () {
+          var p = pl.play();
+          if (p && p.catch) p.catch(function () {
+            /* blocked: wait for gesture handled by gate below */
+          });
+        };
+        unlock(); // best-effort autoplay
+        ["click","keydown","touchstart"].forEach(function (ev) {
+          document.addEventListener(ev, unlock, { once: true });
+        });
+
+        /* ---- Typewriter helper ---- */
+        function el(cls, text) {
+          var d = document.createElement("span");
+          d.className = cls;
+          d.textContent = text;
+          return d;
+        }
+        function line(node) { var l=document.createElement("span"); l.className="ln"; l.appendChild(node); log.appendChild(l); return l; }
+        function sleep(ms){ return new Promise(function(r){ setTimeout(r, ms); }); }
+
+        async function typeInto(span, text, speed) {
+          for (var i=0;i<text.length;i++){
+            span.textContent += text[i];
+            await sleep(speed);
+          }
+        }
+
+        async function hack() {
+          log.innerHTML = "";
+          var p = line(el("dim","")).firstChild;
+          await typeInto(p, "root@javuto:~# ", 55);
+          await sleep(180);
+          await typeInto(p, "./breach --target=local --stealth", 35);
+          line(el("dim",""));
+          line(el("ok","[*] initializing crypto handshake..."));
+          await sleep(250);
+          line(el("cy","[*] generating ephemeral keypair: 0x" + randHex(16)));
+          await sleep(200);
+          line(el("ok","[*] routing through 7 onion relays... done"));
+          await sleep(220);
+          line(el("warn","[!] firewall fingerprint mismatch — spoofing MAC"));
+          await sleep(260);
+
+          /* decrypt progress bar */
+          var dline = line(el("dim",""));
+          var label = document.createElement("span"); label.textContent = "[*] decrypting payload "; dline.appendChild(label);
+          var barSpan = document.createElement("span"); barSpan.className = "bar"; dline.appendChild(barSpan);
+          var pct = document.createElement("span"); pct.className="dim"; dline.appendChild(pct);
+          var total = 24;
+          for (var i=0;i<=total;i++){
+            barSpan.textContent = "█".repeat(i) + "░".repeat(total-i);
+            pct.textContent = " " + Math.floor(i/total*100) + "%";
+            await sleep(38);
+          }
+          line(el("ok",""));
+          var ok2 = line(el("ok","")).firstChild;
+          await typeInto(ok2, "[+] access granted :: welcome, operator", 22);
+          await sleep(300);
+
+          /* reveal payload */
+          glitch.classList.add("show");
+          frame.classList.add("revealed");
+          cap.classList.add("show");
+          links.classList.add("show");
+
+          line(el("dim",""));
+          var tail = line(el("err","")).firstChild;
+          await typeInto(tail, "[!] ACCESS DENIED — you shall not pass", 28);
+          line(el("dim","root@javuto:~# ")).appendChild((function(){ var c=document.createElement("span"); c.className="cursor"; return c; })());
+        }
+
+        function randHex(n){
+          var s="",h="0123456789abcdef";
+          for(var i=0;i<n;i++) s += h[Math.floor(Math.random()*16)];
+          return s;
+        }
+
+        function start() {
+          gate.classList.add("hidden");
+          unlock();
+          hack();
+        }
+        gate.addEventListener("click", start);
+        gate.addEventListener("keydown", function (e){ if(e.key==="Enter"||e.key===" ") { e.preventDefault(); start(); } });
+      })();
     </script>
   </body>
 </html>

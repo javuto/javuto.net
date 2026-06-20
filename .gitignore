@@ -11,3 +11,7 @@
 
 # Ignore some directories
 javuto.net
+
+# Ignore MD files
+*.md
+!README.md
